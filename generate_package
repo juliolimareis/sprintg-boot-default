@@ -1,0 +1,55 @@
+#!/bin/bash
+#########################################################
+# @author: <juliolimareis@gmail.com>                    #
+# @description: Script para gerar pacote para deploy    # 
+# da API Alerta                                         #
+# @depedency: none                                      #
+#########################################################
+
+function header(){
+	echo -e "\033[1;33m ===== Gerarador de Package Deploy ===== \033[0m"
+}
+
+function footer(){
+	echo -e "\033[1;37m Generate Package v1.0.0\033[0m"
+	echo -e "\033[1;37m By <juliolimareis@gmail.com>\033[0m"
+	exit 0
+}
+
+function help(){
+	echo -e "\033[42;1;37m !* Você deve estar na pasta raiz do projeto\033[0m"
+	echo -e "\033[1;37m Você esta em => $PWD \033[0m"
+	echo ""
+	echo -e "\033[1;37m Gerar pacote: \033[0m"
+	echo -e "\033[1;38m generate_package [name_version]\033[0m"
+	echo ""
+	echo -e "\033[1;37m Gerar pacote no diretório: \033[0m"
+	echo -e "\033[1;38m generate_package [name_version] [directory]\033[0m"
+	echo ""
+}
+
+header
+# verifica parametro com nome da versão
+if [ "$1" != '' ]; then
+	echo -e "\033[1;37m Gerar package.war: \033[0m"
+	./mvnw clean package -DskipTests
+
+	echo -e "\033[1;37m Movendo arquivos: \033[0m"
+	mv target/api-alerta-0.0.1.war deploy/api-alerta-0.0.1.war
+
+	dirName="api-alerta-$1.tar.gz"
+	if [ "$2" != '' ]; then
+		dirName="$2/$dirName"
+	fi
+	echo -e "\033[1;37m Gerar api-alerta-$1.tar.gz: \033[0m"
+	tar -zcvf $dirName deploy/ && rm deploy/api-alerta-0.0.1.war
+
+
+	ls api-alerta-$1.tar.gz 2>&1&> /dev/null
+	if [ $? != 0 ]; then
+		echo -e "\033[1;32mPackage gerado com sucesso! => $dirName\033[0m"
+	fi
+else
+	help
+fi
+footer
